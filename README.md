@@ -103,10 +103,10 @@ nested-form/
 
 ```bash
 # Step 1 — Clone the repository
-git clone https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
+git clone https://github.com/saikiran9346/Question-form.git
 
 # Step 2 — Navigate into the project
-cd YOUR_REPO_NAME
+cd Question-form
 
 # Step 3 — Install dependencies
 npm install
