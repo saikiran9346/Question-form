@@ -1,70 +1,75 @@
-# Getting Started with Create React App
+# Nested Form Builder
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A dynamic React form where users can add questions and unlimited levels of nested sub-questions.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- ✅ Add / delete parent questions dynamically
+- ✅ Two question types: **Short Answer** & **True / False**
+- ✅ Nested child questions appear when a True/False answer is set to **True** (recursive, unlimited depth)
+- ✅ Auto-numbering in hierarchical format: `Q1`, `Q1.1`, `Q1.1.1`, `Q2`, …
+- ✅ Delete any question (removes all its children too)
+- ✅ **Drag-and-drop** reordering of parent questions (`@dnd-kit`)
+- ✅ **LocalStorage persistence** — progress is saved automatically
+- ✅ Form submission shows a full hierarchical review
 
-### `npm start`
+## Tech Stack
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+| Tech | Purpose |
+|------|---------|
+| React 18 + Hooks | UI & state management |
+| @dnd-kit/core & sortable | Drag-and-drop reordering |
+| localStorage API | Auto-save persistence |
+| CSS (custom, single file) | All styles in `src/styles/styles.css` |
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Project Structure
 
-### `npm test`
+```
+nested-form/
+├── public/
+│   └── index.html
+├── src/
+│   ├── App.jsx                  ← root component, all state lives here
+│   ├── index.js                 ← React entry point
+│   ├── styles/
+│   │   └── styles.css           ← ALL CSS in one file
+│   ├── components/
+│   │   ├── Question.jsx         ← recursive question component
+│   │   └── SubmitView.jsx       ← read-only hierarchical review
+│   └── utils/
+│       └── questionUtils.js     ← pure helper functions (create/delete/update/addChild)
+├── package.json
+└── README.md
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Setup & Run
 
-### `npm run build`
+```bash
+# 1. Install dependencies
+npm install
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+# 2. Start the dev server
+npm start
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+App opens at **http://localhost:3000**
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## How it works
 
-### `npm run eject`
+### Data Model
+Each question is a plain object:
+```js
+{
+  id: string,       // unique id
+  text: string,     // question text
+  type: 'short' | 'truefalse',
+  answer: '' | 'true' | 'false',
+  children: Question[]   // nested sub-questions
+}
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### Key Logic
+- **Auto-numbering** — computed on render by passing a prefix string down the component tree (`Q1` → `Q1.1` → `Q1.1.1`)
+- **Recursive update/delete** — `questionUtils.js` has pure recursive functions that walk the tree without mutation
+- **Drag-and-drop** — only top-level questions are sortable via `@dnd-kit/sortable`
+- **LocalStorage** — `useEffect` writes the full tree to localStorage on every state change; loaded once on mount via lazy initializer
